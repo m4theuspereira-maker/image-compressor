@@ -7,14 +7,14 @@ import { Response } from 'express';
 export class CompressorController {
   constructor(private readonly appService: CompressorService) {}
 
-  @Post('/image')
+  @Post('/image/save')
   async compressImage(@Req() req: Request, @Res() res: Response) {
     try {
-      const { url, compression } = req.body as any;
+      const { url, compress } = req.body as any;
 
       const result = await this.appService.downloadAndCompressImage(
         url,
-        compression,
+        compress,
       );
 
       return ok(res, result);

@@ -12,4 +12,10 @@ export class CompressorRepository {
   async saveImage(image: { url: string; exif: any }) {
     return (await this.imageModel.create(image)).save();
   }
+
+  async existsByUrl(url: string): Promise<any> {
+    const result = await this.imageModel.findOne({ url });
+
+    return result;
+  }
 }

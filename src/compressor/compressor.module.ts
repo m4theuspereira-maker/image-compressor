@@ -15,6 +15,6 @@ import { Image, ImageSchema } from './models/compressor.model';
 })
 export class CompressorModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ImagesMiddlewares).forRoutes('image');
+    consumer.apply(ImagesMiddlewares).forRoutes('image/save');
   }
 }
