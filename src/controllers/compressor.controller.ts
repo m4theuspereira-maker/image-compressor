@@ -16,10 +16,6 @@ export class CompressorController {
         url,
         compression,
       );
-      
-      if (!result) {
-        return unaceptedUrl(res);
-      }
 
       return ok(res, result);
     } catch (error) {

@@ -13,10 +13,6 @@ import { ICompressionStatistics } from './interfaces';
 export class CompressorService {
   async downloadAndCompressImage(url: string, compression: number) {
     try {
-      if (url.startsWith('http://')) {
-        return false;
-      }
-
       const filepath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_DOWNLAODED_NAME}`;
 
       const compressionRounded = Math.round(compression);
