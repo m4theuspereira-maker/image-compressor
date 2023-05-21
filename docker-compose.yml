@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  image-compressor_network:
+    container_name: image-compressor_network
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    command: "yarn start"
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./:/app"
+    networks:
+      - image-compressor_network
+
+networks:
+  image-compressor_network:
