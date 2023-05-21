@@ -20,7 +20,9 @@ export class CompressorService {
 
       await this.downloadImage(url, filepath);
 
-      const exif = await this.getExifMetadata()
+      const exif = await this.getExifMetadata();
+
+      console.log(exif);
 
       const result = await this.compressImage(filepath, compressionRounded);
 
@@ -114,7 +116,16 @@ export class CompressorService {
     }
   }
 
- async  getExifMetadata() {
+  async getExifMetadata() {
     return ExifReader.load(`./${IMAGE_DOWNLOADED_PATH}/image.jpg`);
+  }
+
+  hasImageMinimunResolutionToCompression(exif: any) {
+    const heigth = Number(exif['Image Height'].replace(/[^0-9\.]+/g, ''));
+    const width = Number(exif['Image Width'].replace(/[^0-9\.]+/g, ''));
+
+    const biggerResolution = heigth > width ? heigth : width;
+
+    return biggerResolution > 720
   }
 }
