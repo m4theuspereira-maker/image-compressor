@@ -26,22 +26,22 @@ export class CompressorService {
 
       await this.deletedOldImageIfItExists();
 
-      await this.downloadImage(url);
+      const downloaded = await this.downloadImage(url);
+      if (downloaded) {
+        const exif = await this.getExifMetadata();
 
-      const exif = await this.getExifMetadata();
+        if (!(await this.compressorRepository.existsByUrl(url))) {
+          await this.compressorRepository.saveImage({ url, exif });
+        }
 
-      if (!(await this.compressorRepository.existsByUrl(url))) {
-        await this.compressorRepository.saveImage({ url, exif });
-      }
+        if (!this.hasImageMinimunResolutionToCompression(exif)) {
+          await this.copyFileWithLowResolution();
+          return this.makeObjectResult(exif);
+        }
 
-      if (this.hasImageMinimunResolutionToCompression(exif)) {
         await this.compressImage(filepath, compressionRounded);
         return this.makeObjectResult(exif);
       }
-
-      await this.copyFileWithLowResolution();
-
-      return this.makeObjectResult(exif);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -59,7 +59,7 @@ export class CompressorService {
 
     response.data.pipe(writer);
 
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       writer.on('finish', () => resolve(true));
       writer.on('error', (err) => reject(err));
     });
@@ -68,9 +68,6 @@ export class CompressorService {
   async compressImage(filepath: string, compression: number) {
     try {
       const compressedFilePath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_COMPRESSED_NAME}_`;
-      let completedStatus: boolean = false;
-      let statisticObject: any = {};
-
       await compressImages(
         filepath,
         compressedFilePath,
@@ -90,16 +87,14 @@ export class CompressorService {
             command: ['--colors', '64', '--use-col=web'],
           },
         },
-        (error: any, completed: boolean, statistic: ICompressionStatistics) => {
-          statisticObject = statistic;
-          completedStatus = completed;
-
-          fs.rename(
+        async (
+          error: any,
+          completed: boolean,
+          statistic: ICompressionStatistics,
+        ) => {
+          await fs.promises.rename(
             `${compressedFilePath}image.jpg`,
             `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
-            () => {
-              console.log('file renamed');
-            },
           );
 
           console.log('-------------');
@@ -109,28 +104,13 @@ export class CompressorService {
           console.log('-------------');
         },
       );
-
-      return {
-        localpath: {
-          original: '/images/original.jpg',
-          thumb: '/images/image_thumb.jpg',
-        },
-        metadata: {
-          data: {
-            completedStatus,
-            statistic: { ...statisticObject },
-          },
-        },
-      };
     } catch (error) {
       throw new InternalServerErrorException();
     }
   }
 
   async getExifMetadata() {
-    const exif = await ExifReader.load(`./${IMAGE_DOWNLOADED_PATH}image.jpg`);
-
-    return exif;
+    return ExifReader.load(`./${IMAGE_DOWNLOADED_PATH}image.jpg`);
   }
 
   hasImageMinimunResolutionToCompression(exif: any) {
@@ -147,33 +127,29 @@ export class CompressorService {
   }
 
   async copyFileWithLowResolution() {
+    if ((await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1) {
+      await fs.promises.unlink(
+        `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
+      );
+    }
+
     fs.readdir(`./${IMAGE_DOWNLOADED_PATH}/`, async () => {
-      fs.copyFile(
+      await fs.promises.copyFile(
         `./${IMAGE_DOWNLOADED_PATH}image.jpg`,
         `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
-        () => {
-          console.log('copyed with success');
-        },
       );
     });
-
-    return 'aaaaaaaaa';
   }
 
   async deletedOldImageIfItExists() {
     if ((await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1) {
-      fs.unlink(
-        `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
-        () => {
-          console.log('deleting old file...');
-        },
-      );
+      await fs.promises.unlink(`${IMAGE_DOWNLOADED_PATH}image.jpg`);
     }
   }
 
   makeObjectResult = (exif: any) => ({
     localpath: {
-      original: '/images/original.jpg',
+      original: '/images/image.jpg',
       thumb: '/images/image_thumb.jpg',
     },
     metadata: { ...exif },
