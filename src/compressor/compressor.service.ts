@@ -16,7 +16,7 @@ import { CompressorRepository } from './compressor.repository';
 
 @Injectable()
 export class CompressorService {
-  constructor(CompressorRepository: CompressorRepository) {}
+  constructor(private compressorRepository: CompressorRepository) {}
 
   async downloadAndCompressImage(url: string, compression: number) {
     try {
@@ -44,6 +44,7 @@ export class CompressorService {
       }
 
       await this.copyFileWithLowResolution();
+      await this.compressorRepository.saveImage({ url, exif });
       return this.makeObjectResult(exif);
     } catch (error) {
       throw new InternalServerErrorException();

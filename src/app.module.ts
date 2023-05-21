@@ -1,14 +1,10 @@
 import { Module } from '@nestjs/common';
 import { CompressorModule } from './compressor/compressor.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { DATABASE_URL } from './compressor/config/environment-contants';
 
 @Module({
-  imports: [
-    CompressorModule,
-    MongooseModule.forRoot(
-      'mongodb://localhost:27017/compress?retryWrites=true&w=majority&authSource=admin',
-    ),
-  ],
+  imports: [CompressorModule, MongooseModule.forRoot(DATABASE_URL)],
   controllers: [],
   providers: [],
 })
