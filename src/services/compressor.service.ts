@@ -20,6 +20,8 @@ export class CompressorService {
 
       await this.downloadImage(url, filepath);
 
+      const exif = await this.getExifMetadata()
+
       const result = await this.compressImage(filepath, compressionRounded);
 
       return result;
@@ -110,5 +112,9 @@ export class CompressorService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+ async  getExifMetadata() {
+    return ExifReader.load(`./${IMAGE_DOWNLOADED_PATH}/image.jpg`);
   }
 }
