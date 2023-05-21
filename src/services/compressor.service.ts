@@ -1,31 +1,39 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as compressImages from 'compress-images';
 import * as fs from 'fs';
 import * as client from 'https';
 import {
+  IMAGE_COMPRESSED_NAME,
   IMAGE_DOWNLAODED_NAME,
   IMAGE_DOWNLOADED_PATH,
 } from '../config/environment-contants';
+import { ICompressionStatistics } from './interfaces';
 
 @Injectable()
-export class AppService {
+export class CompressorService {
   async downloadAndCompressImage(url: string, compression: number) {
-    if (url.startsWith('http://')) {
-      return false;
+    try {
+      if (url.startsWith('http://')) {
+        return false;
+      }
+
+      const filepath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_DOWNLAODED_NAME}`;
+
+      const compressionRounded = Math.round(compression);
+
+      await this.downloadImage(url, filepath);
+
+      const result = await this.compressImage(filepath, compressionRounded);
+
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException();
     }
-
-    const filepath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_DOWNLAODED_NAME}`;
-
-    const compressionRounded = Math.round(compression);
-
-    this.downloadImage(url, filepath);
-
-    await this.compressImage(filepath, compressionRounded);
   }
 
   async downloadImage(url: string, filepath: string) {
     try {
-      return new Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
         client.get(url, (res) => {
           if (res.statusCode === 200) {
             res
@@ -33,7 +41,6 @@ export class AppService {
               .on('error', reject)
               .once('close', () => resolve(filepath));
           } else {
-            // Consume response data to free up memory
             res.resume();
             reject(
               new Error(`Request Failed With a Status Code: ${res.statusCode}`),
@@ -42,16 +49,17 @@ export class AppService {
         });
       });
     } catch (error) {
-      throw new Error('Server Error');
+      throw new InternalServerErrorException();
     }
   }
 
   async compressImage(filepath: string, compression: number) {
     try {
-      const compressedFilePath =
-        'images/' + new Date().getTime() + '-' + 'misera.png';
+      const compressedFilePath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_COMPRESSED_NAME}_`;
+      let completedStatus: boolean = false;
+      let statisticObject: any = {};
 
-      const a = await compressImages(
+      await compressImages(
         filepath,
         compressedFilePath,
         { compress_force: false, statistic: true, autoupdate: true },
@@ -70,19 +78,18 @@ export class AppService {
             command: ['--colors', '64', '--use-col=web'],
           },
         },
-        async (
-          error: any,
-          completed: boolean,
-          statistic: {
-            input: string;
-            path_out_new: string;
-            algorithm: string;
-            size_in: number;
-            size_output: number;
-            percent: number;
-            err: any;
-          },
-        ) => {
+        (error: any, completed: boolean, statistic: ICompressionStatistics) => {
+          statisticObject = statistic;
+          completedStatus = completed;
+
+          fs.rename(
+            `${compressedFilePath}image.png`,
+            `${IMAGE_DOWNLOADED_PATH}/image_${IMAGE_COMPRESSED_NAME}.png`,
+            () => {
+              console.log('file renamed');
+            },
+          );
+
           console.log('-------------');
           console.log(error);
           console.log(completed);
@@ -90,8 +97,21 @@ export class AppService {
           console.log('-------------');
         },
       );
+
+      return {
+        localpath: {
+          original: '/images/original.png',
+          thumb: '/images/image_thumb.png',
+        },
+        metadata: {
+          data: {
+            completedStatus,
+            statistic: { ...statisticObject },
+          },
+        },
+      };
     } catch (error) {
-      throw new Error('peste');
+      throw new InternalServerErrorException();
     }
   }
 }

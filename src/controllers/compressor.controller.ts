@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { AppService } from '../services/app.service.js';
-import { serverError, unaceptedUrl } from '../errors/errors';
+import { CompressorService } from '../services/compressor.service.js';
+import { ok, serverError, unaceptedUrl } from '../errors/errors.js';
 import { Response } from 'express';
 
 @Controller()
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+export class CompressorController {
+  constructor(private readonly appService: CompressorService) {}
 
   @Post('/image')
   async compressImage(@Req() req: Request, @Res() res: Response) {
@@ -16,10 +16,12 @@ export class AppController {
         url,
         compression,
       );
-
+      
       if (!result) {
         return unaceptedUrl(res);
       }
+
+      return ok(res, result);
     } catch (error) {
       return serverError(res);
     }
