@@ -16,9 +16,7 @@ import { CompressorRepository } from './compressor.repository';
 
 @Injectable()
 export class CompressorService {
-
-  constructor(CompressorRepository: CompressorRepository){}
-
+  constructor(CompressorRepository: CompressorRepository) {}
 
   async downloadAndCompressImage(url: string, compression: number) {
     try {
@@ -32,9 +30,7 @@ export class CompressorService {
       if (
         (await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1
       ) {
-        fs.unlink(`./${IMAGE_DOWNLOADED_PATH}image.jpg`, () => {
-          console.log('deleting old file...');
-        });
+        this.deletedOldImage();
       }
 
       const downloaded = await this.downloadImage(url);
@@ -44,12 +40,11 @@ export class CompressorService {
       }
 
       if (this.hasImageMinimunResolutionToCompression(exif)) {
-        result = await this.compressImage(filepath, compressionRounded);
+        await this.compressImage(filepath, compressionRounded);
       }
 
-      result = await this.copyFileWithLowResolution();
-
-      return result;
+      await this.copyFileWithLowResolution();
+      return this.makeObjectResult(exif);
     } catch (error) {
       throw new InternalServerErrorException();
     }
@@ -82,12 +77,7 @@ export class CompressorService {
       if (
         (await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1
       ) {
-        fs.unlink(
-          `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
-          () => {
-            console.log('deleting old file...');
-          },
-        );
+        this.deletedOldImage();
       }
 
       await compressImages(
@@ -178,4 +168,21 @@ export class CompressorService {
 
     return 'aaaaaaaaa';
   }
+
+  deletedOldImage() {
+    fs.unlink(
+      `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
+      () => {
+        console.log('deleting old file...');
+      },
+    );
+  }
+
+  makeObjectResult = (exif: any) => ({
+    localpath: {
+      original: '/images/original.jpg',
+      thumb: '/images/image_thumb.jpg',
+    },
+    metadata: { ...exif },
+  });
 }
