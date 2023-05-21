@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
-import { CompressorService } from '../services/compressor.service.js';
-import { ok, serverError, unaceptedUrl } from '../errors/errors.js';
+import { CompressorService } from './compressor.service.js';
+import { ok, serverError, unaceptedUrl } from './errors/errors.js';
 import { Response } from 'express';
 
 @Controller()
