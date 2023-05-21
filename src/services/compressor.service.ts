@@ -8,6 +8,7 @@ import {
   IMAGE_DOWNLOADED_PATH,
 } from '../config/environment-contants';
 import { ICompressionStatistics } from './interfaces';
+import ExifReader from 'exifreader';
 
 @Injectable()
 export class CompressorService {

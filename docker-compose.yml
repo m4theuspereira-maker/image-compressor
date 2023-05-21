@@ -15,6 +15,20 @@ services:
       - "./:/app"
     networks:
       - image-compressor_network
+      - mongo-compose-network
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: MongoDB2019!
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    networks:
+      - mongo-compose-network
 
 networks:
   image-compressor_network:
+  mongo-compose-network:
