@@ -7,3 +7,8 @@ export interface ICompressionStatistics {
   percent: number;
   err: any;
 }
+
+export interface ISaveImage {
+  url: string;
+  exif: any;
+}
