@@ -14,5 +14,5 @@ export class CompressorImageDto {
     example: 10,
   })
   @IsNotEmpty()
-  compression: number;
+  compress: number;
 }

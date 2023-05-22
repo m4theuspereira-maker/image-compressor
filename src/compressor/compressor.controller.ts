@@ -1,8 +1,9 @@
-import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { CompressorService } from './compressor.service.js';
 import { ok, serverError, unaceptedUrl } from './errors/errors.js';
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
+import { CompressorImageDto } from './dto/compress-image.dto.js';
 
 @Controller()
 export class CompressorController {
@@ -10,9 +11,12 @@ export class CompressorController {
 
   @Post('/image/save')
   @ApiTags('Compress')
-  async compressImage(@Req() req: Request, @Res() res: Response) {
+  async compressImage(
+    @Res() res: Response,
+    @Body() compressImageDto: CompressorImageDto,
+  ) {
     try {
-      const { url, compress } = req.body as any;
+      const { url, compress } = compressImageDto;
 
       const result = await this.appService.downloadAndCompressImage(
         url,
