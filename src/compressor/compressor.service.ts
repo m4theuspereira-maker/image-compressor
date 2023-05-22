@@ -6,7 +6,7 @@ import {
   IMAGE_COMPRESSED_NAME,
   IMAGE_DOWNLAODED_NAME,
   IMAGE_DOWNLOADED_PATH,
-} from './config/environment-contants';
+} from '../config/environment-contants';
 import { ICompressionStatistics } from './interfaces/interfaces';
 import ExifReader from 'exifreader';
 import axios from 'axios';
