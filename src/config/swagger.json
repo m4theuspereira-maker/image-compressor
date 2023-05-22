@@ -1,0 +1,43 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SwordHealth",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "http://localhost:3000/" }],
+  "paths": {
+   
+  },
+  "components": {
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Call Lawyers"
+          },
+          "summary": {
+            "type": "string",
+            "example": "Take the law office phone number"
+          },
+          "userId": {
+            "type": "number",
+            "example": 7
+          },
+          "status": {
+            "type": "string",
+            "example": "to do"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
