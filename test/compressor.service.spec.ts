@@ -3,6 +3,8 @@ import { CompressorService } from '../src/compressor/compressor.service';
 import { CompressorRepository } from '../src/compressor/compressor.repository';
 import { InternalServerErrorException } from '@nestjs/common';
 import { EXIF_METADATA_MOCK } from './mocks';
+import ExifReader from 'exifreader';
+import { IMAGE_DOWNLOADED_PATH } from '../src/config/environment-contants';
 
 describe('CompressorService', () => {
   let compressorService: CompressorService;
@@ -153,7 +155,39 @@ describe('CompressorService', () => {
     });
   });
 
-  
+  describe('getExifMetadata', () => {
+    it('should call exifreader with ', async () => {
+      const loadExifSpy = jest
+        .spyOn(ExifReader, 'load')
+        .mockResolvedValueOnce(EXIF_METADATA_MOCK as any);
 
+      await compressorService.getExifMetadata();
 
+      expect(loadExifSpy).toHaveBeenCalledWith(
+        `./${IMAGE_DOWNLOADED_PATH}image.jpg`,
+      );
+    });
+  });
+
+  describe('hasImageMinimunResolutionToCompression', () => {
+    it('should return true if resolution was bigger than 720px', () => {
+      EXIF_METADATA_MOCK['Image Width'].description = '1080px';
+
+      expect(
+        compressorService.hasImageMinimunResolutionToCompression(
+          EXIF_METADATA_MOCK,
+        ),
+      ).toBeTruthy();
+    });
+
+    it('should return false if resolution was shorter than 720px', () => {
+      EXIF_METADATA_MOCK['Image Width'].description = '719px';
+
+      expect(
+        compressorService.hasImageMinimunResolutionToCompression(
+          EXIF_METADATA_MOCK,
+        ),
+      ).toBeFalsy();
+    });
+  });
 });
