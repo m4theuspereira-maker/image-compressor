@@ -23,7 +23,7 @@ export class CompressorService {
 
       const compressionRounded = Math.round(compression);
 
-      await this.deletedOldImageIfItExists();
+      await this.deletedOldImageIfItExists(`${IMAGE_DOWNLOADED_PATH}image.jpg`);
 
       const downloaded = await this.downloadImage(url);
       if (downloaded) {
@@ -126,23 +126,23 @@ export class CompressorService {
   }
 
   async copyFileWithLowResolution() {
-    if ((await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1) {
-      await fs.promises.unlink(
-        `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
-      );
-    }
+    this.deletedOldImageIfItExists(
+      `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
+    );
 
+    const copyFile = fs.promises.copyFile;
     fs.readdir(`./${IMAGE_DOWNLOADED_PATH}/`, async () => {
-      await fs.promises.copyFile(
+      await copyFile(
         `./${IMAGE_DOWNLOADED_PATH}image.jpg`,
         `${IMAGE_DOWNLOADED_PATH}image_${IMAGE_COMPRESSED_NAME}.jpg`,
       );
     });
   }
 
-  async deletedOldImageIfItExists() {
+  async deletedOldImageIfItExists(imagePath: string) {
+    const unlink = fs.promises.unlink;
     if ((await fs.promises.readdir(`./${IMAGE_DOWNLOADED_PATH}/`)).length > 1) {
-      await fs.promises.unlink(`${IMAGE_DOWNLOADED_PATH}image.jpg`);
+      await unlink(imagePath);
     }
   }
 
