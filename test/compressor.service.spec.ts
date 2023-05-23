@@ -4,7 +4,10 @@ import { CompressorRepository } from '../src/compressor/compressor.repository';
 import { InternalServerErrorException } from '@nestjs/common';
 import { EXIF_METADATA_MOCK } from './mocks';
 import ExifReader from 'exifreader';
-import { IMAGE_DOWNLOADED_PATH } from '../src/config/environment-contants';
+import {
+  IMAGE_DOWNLOADED_PATH,
+} from '../src/config/environment-contants';
+import * as fs from 'fs';
 
 describe('CompressorService', () => {
   let compressorService: CompressorService;
@@ -188,6 +191,41 @@ describe('CompressorService', () => {
           EXIF_METADATA_MOCK,
         ),
       ).toBeFalsy();
+    });
+  });
+
+  describe('copyFileWithLowResolution', () => {
+    it('should call unlink if folder has more than 1 file', async () => {
+      jest
+        .spyOn(fs.promises, 'readdir')
+        .mockResolvedValueOnce(['file1', 'file2'] as any);
+
+      const unlinkSpy = jest
+        .spyOn(fs.promises, 'unlink')
+        .mockResolvedValueOnce();
+      jest.spyOn(fs.promises, 'copyFile').mockResolvedValueOnce();
+
+      await compressorService.copyFileWithLowResolution();
+
+      expect(unlinkSpy).toHaveBeenCalled();
+    });
+
+    it('should *NOT* call unlink if folder has 1 file or less', async () => {
+      jest
+        .spyOn(fs.promises, 'readdir')
+        .mockResolvedValueOnce(['file1'] as any);
+
+      const unlinkSpy = jest
+        .spyOn(fs.promises, 'unlink')
+        .mockResolvedValueOnce();
+
+      jest.spyOn(compressorService, 'deletedOldImageIfItExists');
+
+      jest.spyOn(fs.promises, 'copyFile').mockResolvedValueOnce();
+
+      await compressorService.copyFileWithLowResolution();
+
+      expect(unlinkSpy).not.toHaveBeenCalled();
     });
   });
 });
