@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { CompressorService } from './compressor.service';
-import { ok, serverError,  } from './errors/errors';
+import { ok, serverError } from './errors/errors';
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 import { CompressorImageDto } from './dto/compress-image.dto';

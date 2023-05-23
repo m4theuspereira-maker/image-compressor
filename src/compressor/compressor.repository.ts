@@ -10,7 +10,7 @@ export class CompressorRepository {
     @InjectModel(Image.name) private imageModel: Model<ImageDocument>,
   ) {}
 
-  async saveImage(image: ISaveImage) {
+  async saveImage(image: ISaveImage): Promise<Image> {
     return (await this.imageModel.create(image)).save();
   }
 
