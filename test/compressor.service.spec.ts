@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CompressorService } from '../src/compressor/compressor.service';
 import { CompressorRepository } from '../src/compressor/compressor.repository';
 import { InternalServerErrorException } from '@nestjs/common';
-import { EXIF_METADATA_MOCK } from './mocks';
+import { EXIF_METADATA_MOCK } from './common/mocks';
 import ExifReader from 'exifreader';
 import {
   IMAGE_DOWNLOADED_PATH,
