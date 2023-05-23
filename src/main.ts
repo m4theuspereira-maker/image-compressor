@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { PORT } from './config/environment-contants';
+import { PORT } from './common/environment-contants';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 

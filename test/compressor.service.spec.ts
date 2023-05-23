@@ -6,7 +6,7 @@ import { EXIF_METADATA_MOCK } from './common/mocks';
 import ExifReader from 'exifreader';
 import {
   IMAGE_DOWNLOADED_PATH,
-} from '../src/config/environment-contants';
+} from '../src/common/environment-contants';
 import * as fs from 'fs';
 
 describe('CompressorService', () => {
