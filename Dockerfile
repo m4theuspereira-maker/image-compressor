@@ -8,6 +8,6 @@ COPY dist /app/
 COPY node_modules /app/node_modules
 COPY yarn.lock /app/yarn.lock
 
-CMD ["node", "./index.js"]
+CMD ["node", "./main.js"]
 
 EXPOSE 3000

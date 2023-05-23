@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import * as compressImages from 'compress-images';
 import * as fs from 'fs';
-import * as client from 'https';
 import {
   IMAGE_COMPRESSED_NAME,
   IMAGE_DOWNLAODED_NAME,
