@@ -66,7 +66,7 @@ export class CompressorService {
 
   async compressImage(filepath: string, compression: number) {
     try {
-      const compressedFilePath = `${IMAGE_DOWNLOADED_PATH}/${IMAGE_COMPRESSED_NAME}_`;
+      const compressedFilePath = `${IMAGE_DOWNLOADED_PATH}${IMAGE_COMPRESSED_NAME}_`;
       await compressImages(
         filepath,
         compressedFilePath,

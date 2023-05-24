@@ -1,3 +1,8 @@
+import { resolve } from "path";
+import { config } from "dotenv";
+
+config({ path: resolve(__dirname, "../../.env") });
+
 export const IMAGE_DOWNLOADED_PATH = 'images/';
 export const IMAGE_DOWNLAODED_NAME = 'image.jpg';
 export const IMAGE_COMPRESSED_NAME = 'thumb';
