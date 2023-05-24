@@ -24,8 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
+This project is a thumb maker, wich you put the image url in the request body and it makes the image download and compress according your preference. 
 ## Installation
 
 ```bash
@@ -36,38 +35,81 @@ $ yarn install
 
 ```bash
 # development
-$ yarn run start
+$ yarn start
 
 # watch mode
-$ yarn run start:dev
+$ yarn start:dev
 
 # production mode
-$ yarn run start:prod
+$ yarn start:prod
 ```
 
 ## Test
 
 ```bash
 # unit tests
-$ yarn run test
+$ yarn test
 
 # e2e tests
-$ yarn run test:e2e
+$ yarn test:e2e
 
 # test coverage
-$ yarn run test:cov
+$ yarn test:cov
 ```
 
-## Support
+### To start project from docker container
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+(know more in: https://docs.docker.com/get-started/ and https://docs.docker.com/compose/gettingstarted/)
 
-## Stay in touch
+```
+$ docker-compose up
+```
+To build a container and then start automatically
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### To access application from browser 
 
-## License
+```
+http://localhost:3000/api
+```
 
-Nest is [MIT licensed](LICENSE).
+## Project folders schema
+```
+├─ .circleci
+│  └─ config.yml
+├─ src
+│  ├─ app.module.ts
+│  ├─ common
+│  │  └─ environment-contants.ts
+│  ├─ compressor
+│  │  ├─ compressor.controller.ts
+│  │  ├─ compressor.module.ts
+│  │  ├─ compressor.repository.ts
+│  │  ├─ compressor.service.ts
+│  │  ├─ dto
+│  │  │  └─ compress-image.dto.ts
+│  │  ├─ errors
+│  │  │  └─ errors.ts
+│  │  ├─ interfaces
+│  │  │  └─ interfaces.ts
+│  │  ├─ middlewares
+│  │  │  └─ image.middlewares.ts
+│  │  └─ models
+│  │     └─ compressor.model.ts
+│  └─ main.ts
+├─ test
+│  ├─ app.e2e-spec.ts
+│  ├─ common
+│  │  ├─ mocks.ts
+│  │  └─ mongo-in-memory-config.ts
+│  └─ compressor.service.spec.ts
+├─ .dockerignore
+├─ .eslintrc.js
+├─ .gitignore
+├─ .prettierrc
+├─ Dockerfile
+├─ README.md
+├─ package.json
+├─ tsconfig.build.json
+├─ tsconfig.json
+└─ yarn.lock
+```
